@@ -1,11 +1,12 @@
+# YouTube Analytics Platform 
 
 ```html
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>पठानकोट यूट्यूब विश्लेषण प्लेटफॉर्म</title>
+    <title>Pathankot YouTube Analysis Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Chart.js for analytics -->
@@ -331,7 +332,7 @@
             </div>
             <a class="navbar-brand" href="#">
                 <i class="fab fa-youtube text-danger me-2"></i>
-                पठानकोट यूट्यूब विश्लेषण
+                Pathankot YouTube Analysis
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
                 <span class="navbar-toggler-icon"></span>
@@ -339,7 +340,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="search-box w-50 mx-auto">
                     <div class="input-group">
-                        <input type="text" class="form-control" id="searchInput" placeholder="कीवर्ड खोजें..." aria-label="कीवर्ड खोजें">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search keywords..." aria-label="Search keywords">
                         <button class="btn btn-danger" type="button" id="searchButton">
                             <i class="fas fa-search"></i>
                         </button>
@@ -349,23 +350,23 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
-                            <i class="fas fa-key"></i> API कुंजी
+                            <i class="fas fa-key"></i> API Key
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#savedSearchesModal">
-                            <i class="fas fa-bookmark"></i> सहेजी गई खोजें
+                            <i class="fas fa-bookmark"></i> Saved Searches
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-cog"></i> सेटिंग्स
+                            <i class="fas fa-cog"></i> Settings
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">प्राथमिकताएँ</a></li>
-                            <li><a class="dropdown-item" href="#" id="exportDataBtn">डेटा निर्यात करें</a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal">Preferences</a></li>
+                            <li><a class="dropdown-item" href="#" id="exportDataBtn">Export Data</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">सहायता</a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">Help</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -375,40 +376,40 @@
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-heading mb-3">फिल्टर</div>
+        <div class="sidebar-heading mb-3">Filters</div>
         
         <!-- Main navigation -->
         <div class="sidebar-item active" data-view="discover">
-            <i class="fas fa-compass"></i> <span>खोज</span>
+            <i class="fas fa-compass"></i> <span>Discover</span>
         </div>
         <div class="sidebar-item" data-view="trending">
-            <i class="fas fa-chart-line"></i> <span>ट्रेंडिंग</span>
+            <i class="fas fa-chart-line"></i> <span>Trending</span>
         </div>
         <div class="sidebar-item" data-view="analytics">
-            <i class="fas fa-chart-bar"></i> <span>विश्लेषण</span>
+            <i class="fas fa-chart-bar"></i> <span>Analytics</span>
         </div>
         <div class="sidebar-item" data-view="saved">
-            <i class="fas fa-bookmark"></i> <span>सहेजे गए</span>
+            <i class="fas fa-bookmark"></i> <span>Saved</span>
         </div>
         <div class="sidebar-item" data-view="history">
-            <i class="fas fa-history"></i> <span>इतिहास</span>
+            <i class="fas fa-history"></i> <span>History</span>
         </div>
         
         <!-- Filter sections -->
         <div class="filter-section">
-            <h6><i class="fas fa-filter me-2"></i>फिल्टर्स</h6>
+            <h6><i class="fas fa-filter me-2"></i>Filters</h6>
             
             <!-- Upload date filter -->
             <div class="mb-3">
-                <label class="form-label text-light small">अपलोड दिनांक</label>
+                <label class="form-label text-light small">Upload Date</label>
                 <select class="form-select form-select-sm" id="uploadDateFilter">
-                    <option value="any">किसी भी समय</option>
-                    <option value="hour">पिछले घंटे</option>
-                    <option value="today">आज</option>
-                    <option value="week">इस सप्ताह</option>
-                    <option value="month">इस महीने</option>
-                    <option value="year">इस वर्ष</option>
-                    <option value="custom">कस्टम रेंज</option>
+                    <option value="any">Any time</option>
+                    <option value="hour">Last hour</option>
+                    <option value="today">Today</option>
+                    <option value="week">This week</option>
+                    <option value="month">This month</option>
+                    <option value="year">This year</option>
+                    <option value="custom">Custom range</option>
                 </select>
                 <div id="customDateRange" class="mt-2" style="display: none;">
                     <input type="date" class="form-control form-control-sm mb-2" id="startDate">
@@ -418,39 +419,39 @@
             
             <!-- Language filter -->
             <div class="mb-3">
-                <label class="form-label text-light small">भाषा</label>
+                <label class="form-label text-light small">Language</label>
                 <select class="form-select form-select-sm" id="languageFilter">
-                    <option value="any">कोई भी भाषा</option>
-                    <option value="en">अंग्रेज़ी</option>
-                    <option value="hi">हिंदी</option>
-                    <option value="es">स्पेनिश</option>
-                    <option value="fr">फ्रेंच</option>
-                    <option value="de">जर्मन</option>
-                    <option value="ja">जापानी</option>
-                    <option value="ko">कोरियाई</option>
-                    <option value="zh">चीनी</option>
-                    <option value="ar">अरबी</option>
-                    <option value="ru">रूसी</option>
+                    <option value="any">Any language</option>
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ar">Arabic</option>
+                    <option value="ru">Russian</option>
                 </select>
             </div>
             
             <!-- Duration filter -->
             <div class="mb-3">
-                <label class="form-label text-light small">अवधि</label>
+                <label class="form-label text-light small">Duration</label>
                 <select class="form-select form-select-sm" id="durationFilter">
-                    <option value="any">कोई भी अवधि</option>
-                    <option value="short">छोटी (< 4 मिनट)</option>
-                    <option value="medium">मध्यम (4-20 मिनट)</option>
-                    <option value="long">लंबी (> 20 मिनट)</option>
-                    <option value="custom">कस्टम रेंज</option>
+                    <option value="any">Any duration</option>
+                    <option value="short">Short (< 4 minutes)</option>
+                    <option value="medium">Medium (4-20 minutes)</option>
+                    <option value="long">Long (> 20 minutes)</option>
+                    <option value="custom">Custom range</option>
                 </select>
                 <div id="customDurationRange" class="mt-2" style="display: none;">
                     <div class="row g-2">
                         <div class="col-6">
-                            <input type="number" class="form-control form-control-sm" id="minDuration" placeholder="न्यूनतम (सेकंड)">
+                            <input type="number" class="form-control form-control-sm" id="minDuration" placeholder="Min (seconds)">
                         </div>
                         <div class="col-6">
-                            <input type="number" class="form-control form-control-sm" id="maxDuration" placeholder="अधिकतम (सेकंड)">
+                            <input type="number" class="form-control form-control-sm" id="maxDuration" placeholder="Max (seconds)">
                         </div>
                     </div>
                 </div>
@@ -458,26 +459,26 @@
             
             <!-- View count filter -->
             <div class="mb-3">
-                <label class="form-label text-light small">व्यू काउंट</label>
+                <label class="form-label text-light small">View Count</label>
                 <div class="row g-2">
                     <div class="col-6">
-                        <input type="number" class="form-control form-control-sm" id="minViews" placeholder="न्यूनतम व्यूज़">
+                        <input type="number" class="form-control form-control-sm" id="minViews" placeholder="Min views">
                     </div>
                     <div class="col-6">
-                        <input type="number" class="form-control form-control-sm" id="maxViews" placeholder="अधिकतम व्यूज़">
+                        <input type="number" class="form-control form-control-sm" id="maxViews" placeholder="Max views">
                     </div>
                 </div>
             </div>
             
             <!-- Subscriber count filter -->
             <div class="mb-3">
-                <label class="form-label text-light small">चैनल सब्सक्राइबर्स</label>
+                <label class="form-label text-light small">Channel Subscribers</label>
                 <div class="row g-2">
                     <div class="col-6">
-                        <input type="number" class="form-control form-control-sm" id="minSubs" placeholder="न्यूनतम सब्स">
+                        <input type="number" class="form-control form-control-sm" id="minSubs" placeholder="Min subs">
                     </div>
                     <div class="col-6">
-                        <input type="number" class="form-control form-control-sm" id="maxSubs" placeholder="अधिकतम सब्स">
+                        <input type="number" class="form-control form-control-sm" id="maxSubs" placeholder="Max subs">
                     </div>
                 </div>
             </div>
@@ -487,70 +488,70 @@
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="hasTranscript">
                     <label class="form-check-label text-light small" for="hasTranscript">
-                        ट्रांसक्रिप्ट है
+                        Has transcript
                     </label>
                 </div>
             </div>
             
             <!-- Categories -->
             <div class="mb-3">
-                <label class="form-label text-light small">श्रेणियां</label>
+                <label class="form-label text-light small">Categories</label>
                 <select class="form-select form-select-sm" id="categoryFilter" multiple size="5">
-                    <option value="1">फिल्म और एनीमेशन</option>
-                    <option value="2">ऑटो और वाहन</option>
-                    <option value="10">संगीत</option>
-                    <option value="15">पालतू जानवर और प्राणी</option>
-                    <option value="17">खेल</option>
-                    <option value="18">लघु फिल्में</option>
-                    <option value="19">यात्रा और कार्यक्रम</option>
-                    <option value="20">गेमिंग</option>
-                    <option value="21">वीडियो ब्लॉगिंग</option>
-                    <option value="22">लोग और ब्लॉग</option>
-                    <option value="23">कॉमेडी</option>
-                    <option value="24">मनोरंजन</option>
-                    <option value="25">समाचार और राजनीति</option>
-                    <option value="26">हाउटू और स्टाइल</option>
-                    <option value="27">शिक्षा</option>
-                    <option value="28">विज्ञान और प्रौद्योगिकी</option>
-                    <option value="29">गैर-लाभकारी और सक्रियता</option>
-                    <option value="30">फिल्में</option>
-                    <option value="31">एनीमे/एनिमेशन</option>
-                    <option value="32">एक्शन/एडवेंचर</option>
-                    <option value="33">क्लासिक्स</option>
-                    <option value="34">कॉमेडी</option>
-                    <option value="35">डॉक्यूमेंट्री</option>
-                    <option value="36">ड्रामा</option>
-                    <option value="37">परिवार</option>
-                    <option value="38">विदेशी</option>
-                    <option value="39">हॉरर</option>
-                    <option value="40">साइंस-फिक्शन/फैंटेसी</option>
-                    <option value="41">थ्रिलर</option>
-                    <option value="42">शॉर्ट्स</option>
-                    <option value="43">शोज़</option>
-                    <option value="44">ट्रेलर्स</option>
+                    <option value="1">Film & Animation</option>
+                    <option value="2">Autos & Vehicles</option>
+                    <option value="10">Music</option>
+                    <option value="15">Pets & Animals</option>
+                    <option value="17">Sports</option>
+                    <option value="18">Short Movies</option>
+                    <option value="19">Travel & Events</option>
+                    <option value="20">Gaming</option>
+                    <option value="21">Videoblogging</option>
+                    <option value="22">People & Blogs</option>
+                    <option value="23">Comedy</option>
+                    <option value="24">Entertainment</option>
+                    <option value="25">News & Politics</option>
+                    <option value="26">Howto & Style</option>
+                    <option value="27">Education</option>
+                    <option value="28">Science & Technology</option>
+                    <option value="29">Nonprofits & Activism</option>
+                    <option value="30">Movies</option>
+                    <option value="31">Anime/Animation</option>
+                    <option value="32">Action/Adventure</option>
+                    <option value="33">Classics</option>
+                    <option value="34">Comedy</option>
+                    <option value="35">Documentary</option>
+                    <option value="36">Drama</option>
+                    <option value="37">Family</option>
+                    <option value="38">Foreign</option>
+                    <option value="39">Horror</option>
+                    <option value="40">Sci-Fi/Fantasy</option>
+                    <option value="41">Thriller</option>
+                    <option value="42">Shorts</option>
+                    <option value="43">Shows</option>
+                    <option value="44">Trailers</option>
                 </select>
             </div>
             
             <!-- Apply filters button -->
             <button class="btn btn-danger btn-sm w-100 mb-2" id="applyFiltersBtn">
-                <i class="fas fa-filter me-2"></i>फिल्टर लागू करें
+                <i class="fas fa-filter me-2"></i>Apply Filters
             </button>
             <button class="btn btn-outline-light btn-sm w-100" id="resetFiltersBtn">
-                <i class="fas fa-undo me-2"></i>फिल्टर रीसेट करें
+                <i class="fas fa-undo me-2"></i>Reset Filters
             </button>
         </div>
         
         <!-- Saved searches section -->
         <div class="filter-section">
-            <h6><i class="fas fa-bookmark me-2"></i>सहेजी गई खोजें</h6>
+            <h6><i class="fas fa-bookmark me-2"></i>Saved Searches</h6>
             <div class="saved-searches-list" id="savedSearchesList">
                 <div class="text-center text-light small">
-                    <p>अभी तक कोई सहेजी गई खोज नहीं</p>
+                    <p>No saved searches yet</p>
                 </div>
             </div>
             <div class="mt-2">
                 <button class="btn btn-outline-light btn-sm w-100" id="saveCurrentSearch" disabled>
-                    <i class="fas fa-save me-2"></i>वर्तमान खोज सहेजें
+                    <i class="fas fa-save me-2"></i>Save Current Search
                 </button>
             </div>
         </div>
@@ -563,43 +564,43 @@
             <!-- Initial loading state -->
             <div class="text-center py-5" id="initialState">
                 <img src="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg" alt="YouTube" height="50" class="mb-4">
-                <h2 class="mb-3">पठानकोट यूट्यूब वीडियो विश्लेषण और खोज</h2>
-                <p class="lead mb-4">ट्रेंडिंग वीडियो खोजने और प्रदर्शन डेटा का विश्लेषण करने के लिए कीवर्ड खोजें</p>
+                <h2 class="mb-3">Pathankot YouTube Video Analysis and Search</h2>
+                <p class="lead mb-4">Search for keywords to discover trending videos and analyze performance data</p>
                 <div class="row justify-content-center gap-4 mb-4">
                     <div class="col-md-3">
                         <div class="card text-center p-4">
                             <i class="fas fa-search fa-3x text-danger mb-3"></i>
-                            <h5>वीडियो खोजें</h5>
-                            <p class="small text-muted">अपने कीवर्ड के लिए नवीनतम वीडियो खोजें</p>
+                            <h5>Search Videos</h5>
+                            <p class="small text-muted">Find latest videos for your keywords</p>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card text-center p-4">
                             <i class="fas fa-chart-line fa-3x text-danger mb-3"></i>
-                            <h5>रुझान ट्रैक करें</h5>
-                            <p class="small text-muted">अपने क्षेत्र में ट्रेंडिंग क्या है, देखें</p>
+                            <h5>Track Trends</h5>
+                            <p class="small text-muted">See what's trending in your area</p>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card text-center p-4">
                             <i class="fas fa-film fa-3x text-danger mb-3"></i>
-                            <h5>सामग्री विश्लेषण</h5>
-                            <p class="small text-muted">वीडियो प्रदर्शन पर अंतर्दृष्टि प्राप्त करें</p>
+                            <h5>Content Analysis</h5>
+                            <p class="small text-muted">Gain insights on video performance</p>
                         </div>
                     </div>
                 </div>
                 <div class="input-group mb-3 mx-auto" style="max-width: 500px;">
-                    <input type="text" class="form-control form-control-lg" placeholder="खोज के लिए कीवर्ड दर्ज करें..." id="mainSearchInput">
+                    <input type="text" class="form-control form-control-lg" placeholder="Enter keywords to search..." id="mainSearchInput">
                     <button class="btn btn-danger btn-lg" type="button" id="mainSearchButton">
-                        <i class="fas fa-search me-2"></i>खोज
+                        <i class="fas fa-search me-2"></i>Search
                     </button>
                 </div>
                 <div class="small text-muted">
-                    <strong>लोकप्रिय कीवर्ड:</strong>
-                    <a href="#" class="keyword-suggestion">पठानकोट न्यूज़</a> • 
-                    <a href="#" class="keyword-suggestion">पठानकोट पर्यटन स्थल</a> • 
-                    <a href="#" class="keyword-suggestion">पठानकोट भोजन</a> • 
-                    <a href="#" class="keyword-suggestion">पठानकोट मंदिर</a>
+                    <strong>Popular Keywords:</strong>
+                    <a href="#" class="keyword-suggestion">Pathankot News</a> • 
+                    <a href="#" class="keyword-suggestion">Pathankot Tourism</a> • 
+                    <a href="#" class="keyword-suggestion">Pathankot Food</a> • 
+                    <a href="#" class="keyword-suggestion">Pathankot Temple</a>
                 </div>
             </div>
             
@@ -607,10 +608,10 @@
             <div id="loadingState" style="display: none;">
                 <div class="text-center py-5">
                     <div class="spinner-border text-danger mb-3" role="status" style="width: 3rem; height: 3rem;">
-                        <span class="visually-hidden">लोड हो रहा है...</span>
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <h4 class="mt-3">यूट्यूब खोज जारी है...</h4>
-                    <p class="text-muted" id="loadingMessage">आपके कीवर्ड के लिए वीडियो प्राप्त किए जा रहे हैं</p>
+                    <h4 class="mt-3">YouTube Search in Progress...</h4>
+                    <p class="text-muted" id="loadingMessage">Retrieving videos for your keywords</p>
                     <div class="progress mt-4" style="height: 10px; max-width: 500px; margin: 0 auto;">
                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger" role="progressbar" id="searchProgress" style="width: 0%"></div>
                     </div>
@@ -621,7 +622,7 @@
             <div id="resultsState" style="display: none;">
                 <!-- Results header with metrics -->
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-                    <h3 id="resultsTitle">"<span id="searchTermDisplay"></span>" के लिए परिणाम</h3>
+                    <h3 id="resultsTitle">Results for "<span id="searchTermDisplay"></span>"</h3>
                     <div class="d-flex">
                         <div class="btn-group me-2">
                             <button type="button" class="btn btn-outline-secondary active" id="gridViewBtn">
@@ -632,10 +633,10 @@
                             </button>
                         </div>
                         <select class="form-select" id="sortOptions" style="width: auto;">
-                            <option value="relevance">प्रासंगिकता</option>
-                            <option value="date">अपलोड तिथि (नवीनतम)</option>
-                            <option value="viewCount">व्यू काउंट (अधिकतम)</option>
-                            <option value="rating">रेटिंग (अधिकतम)</option>
+                            <option value="relevance">Relevance</option>
+                            <option value="date">Upload date (latest)</option>
+                            <option value="viewCount">View count (highest)</option>
+                            <option value="rating">Rating (highest)</option>
                         </select>
                     </div>
                 </div>
@@ -645,25 +646,25 @@
                     <div class="col-md-3 col-sm-6">
                         <div class="metric-card">
                             <div class="metric-value" id="totalVideosMetric">0</div>
-                            <div class="metric-label">कुल वीडियो</div>
+                            <div class="metric-label">Total Videos</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <div class="metric-card">
                             <div class="metric-value" id="totalViewsMetric">0</div>
-                            <div class="metric-label">कुल व्यूज़</div>
+                            <div class="metric-label">Total Views</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <div class="metric-card">
                             <div class="metric-value" id="avgViewsMetric">0</div>
-                            <div class="metric-label">औसत व्यूज़</div>
+                            <div class="metric-label">Average Views</div>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-6">
                         <div class="metric-card">
                             <div class="metric-value" id="avgEngagementMetric">0%</div>
-                            <div class="metric-label">औसत एन्गेजमेंट</div>
+                            <div class="metric-label">Avg. Engagement</div>
                         </div>
                     </div>
                 </div>
@@ -671,13 +672,13 @@
                 <!-- Results tabs -->
                 <ul class="nav nav-pills mb-4" id="resultsTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="videos-tab" data-bs-toggle="pill" data-bs-target="#videos-tab-pane" type="button" role="tab">वीडियो</button>
+                        <button class="nav-link active" id="videos-tab" data-bs-toggle="pill" data-bs-target="#videos-tab-pane" type="button" role="tab">Videos</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="analytics-tab" data-bs-toggle="pill" data-bs-target="#analytics-tab-pane" type="button" role="tab">विश्लेषण</button>
+                        <button class="nav-link" id="analytics-tab" data-bs-toggle="pill" data-bs-target="#analytics-tab-pane" type="button" role="tab">Analytics</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="trending-tab" data-bs-toggle="pill" data-bs-target="#trending-tab-pane" type="button" role="tab">ट्रेंडिंग विषय</button>
+                        <button class="nav-link" id="trending-tab" data-bs-toggle="pill" data-bs-target="#trending-tab-pane" type="button" role="tab">Trending Topics</button>
                     </li>
                 </ul>
                 
@@ -714,7 +715,7 @@
                             <!-- Views by keyword chart -->
                             <div class="col-md-6 mb-4">
                                 <div class="analytics-card">
-                                    <h5 class="mb-3">कीवर्ड द्वारा व्यूज</h5>
+                                    <h5 class="mb-3">Views by Keyword</h5>
                                     <canvas id="keywordViewsChart"></canvas>
                                 </div>
                             </div>
@@ -722,7 +723,7 @@
                             <!-- Video duration distribution chart -->
                             <div class="col-md-6 mb-4">
                                 <div class="analytics-card">
-                                    <h5 class="mb-3">वीडियो अवधि वितरण</h5>
+                                    <h5 class="mb-3">Video Duration Distribution</h5>
                                     <canvas id="durationDistributionChart"></canvas>
                                 </div>
                             </div>
@@ -730,7 +731,7 @@
                             <!-- Upload time analysis -->
                             <div class="col-md-6 mb-4">
                                 <div class="analytics-card">
-                                    <h5 class="mb-3">अपलोड समय विश्लेषण</h5>
+                                    <h5 class="mb-3">Upload Time Analysis</h5>
                                     <canvas id="uploadTimeChart"></canvas>
                                 </div>
                             </div>
@@ -738,7 +739,7 @@
                             <!-- Engagement vs Views scatter chart -->
                             <div class="col-md-6 mb-4">
                                 <div class="analytics-card">
-                                    <h5 class="mb-3">एन्गेजमेंट बनाम व्यूज</h5>
+                                    <h5 class="mb-3">Engagement vs Views</h5>
                                     <canvas id="engagementScatterChart"></canvas>
                                 </div>
                             </div>
@@ -751,7 +752,7 @@
                             <!-- Trending topics word cloud -->
                             <div class="col-md-6 mb-4">
                                 <div class="analytics-card">
-                                    <h5 class="mb-3">ट्रेंडिंग विषय</h5>
+                                    <h5 class="mb-3">Trending Topics</h5>
                                     <div id="topicCloud" style="height: 300px; position: relative;"></div>
                                 </div>
                             </div>
@@ -759,15 +760,15 @@
                             <!-- Top performing topics -->
                             <div class="col-md-6 mb-4">
                                 <div class="analytics-card">
-                                    <h5 class="mb-3">शीर्ष प्रदर्शन विषय</h5>
+                                    <h5 class="mb-3">Top Performing Topics</h5>
                                     <div class="table-responsive">
                                         <table class="table table-striped table-hover" id="topTopicsTable">
                                             <thead>
                                                 <tr>
-                                                    <th>विषय</th>
-                                                    <th>वीडियो</th>
-                                                    <th>औसत व्यूज</th>
-                                                    <th>एन्गेजमेंट</th>
+                                                    <th>Topic</th>
+                                                    <th>Videos</th>
+                                                    <th>Avg Views</th>
+                                                    <th>Engagement</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -781,13 +782,131 @@
                             <!-- Recently trending videos for your keywords -->
                             <div class="col-12">
                                 <div class="analytics-card">
-                                    <h5 class="mb-3">हाल ही में ट्रेंडिंग वीडियो</h5>
+                                    <h5 class="mb-3">Recently Trending Videos</h5>
                                     <div class="table-responsive">
                                         <table class="table table-hover" id="trendingVideosTable">
                                             <thead>
                                                 <tr>
-                                                    <th>वीडियो</th>
-                                                    <th>चैनल</th>
-                                                    <th>व्यूज</th>
-                                                    <th>प्रकाशित</th>
-                                                
+                                                    <th>Video</th>
+                                                    <th>Channel</th>
+                                                    <th>Views</th>
+                                                    <th>Published</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Will be populated dynamically -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // This will be your JavaScript implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize sidebar toggle
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            });
+            
+            // Main search functionality
+            const mainSearchButton = document.getElementById('mainSearchButton');
+            const mainSearchInput = document.getElementById('mainSearchInput');
+            const searchButton = document.getElementById('searchButton');
+            const searchInput = document.getElementById('searchInput');
+            
+            function performSearch(query) {
+                if (!query) return;
+                
+                // Show loading state
+                document.getElementById('initialState').style.display = 'none';
+                document.getElementById('resultsState').style.display = 'none';
+                document.getElementById('loadingState').style.display = 'block';
+                
+                // Simulate search progress
+                let progress = 0;
+                const progressBar = document.getElementById('searchProgress');
+                const loadingMessage = document.getElementById('loadingMessage');
+                
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = progress + '%';
+                    
+                    if (progress === 30) {
+                        loadingMessage.textContent = 'Analyzing video metrics...';
+                    } else if (progress === 60) {
+                        loadingMessage.textContent = 'Processing data...';
+                    } else if (progress === 90) {
+                        loadingMessage.textContent = 'Preparing results...';
+                    }
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        // Show results
+                        setTimeout(() => {
+                            document.getElementById('loadingState').style.display = 'none';
+                            document.getElementById('resultsState').style.display = 'block';
+                            document.getElementById('searchTermDisplay').textContent = query;
+                            // Update metrics with random data for demo
+                            document.getElementById('totalVideosMetric').textContent = Math.floor(Math.random() * 500 + 100);
+                            document.getElementById('totalViewsMetric').textContent = (Math.floor(Math.random() * 10000 + 5000) / 1000).toFixed(1) + 'K';
+                            document.getElementById('avgViewsMetric').textContent = (Math.floor(Math.random() * 50 + 10) * 100).toLocaleString();
+                            document.getElementById('avgEngagementMetric').textContent = (Math.random() * 10 + 2).toFixed(1) + '%';
+                            
+                            // Populate video grid with demo data
+                            populateVideoGrid(query);
+                        }, 500);
+                    }
+                }, 100);
+            }
+            
+            mainSearchButton.addEventListener('click', function() {
+                performSearch(mainSearchInput.value);
+            });
+            
+            mainSearchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch(mainSearchInput.value);
+                }
+            });
+            
+            searchButton.addEventListener('click', function() {
+                performSearch(searchInput.value);
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch(searchInput.value);
+                }
+            });
+            
+            // Suggested keywords
+            document.querySelectorAll('.keyword-suggestion').forEach(elem => {
+                elem.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    mainSearchInput.value = this.textContent;
+                    performSearch(this.textContent);
+                });
+            });
+            
+            // Function to populate video grid with mock data
+            function populateVideoGrid(query) {
+                const videoGrid = document.getElementById('videoGrid');
+                videoGrid.innerHTML = '';
+                
+                // Mock video data
+                const categories = ['News', 'Travel', 'Food', 'Entertainment', 'Education'];
+                const channels = ['Pathankot News Network', 
