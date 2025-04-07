@@ -22,7 +22,7 @@
         
         body {
             background-color: var(--light-bg);
-            padding-top: 60px;
+            
             font-family: 'Roboto', sans-serif;
         }
         
