@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 import pandas as pd
 import os
 import json
+import plotly.express as px
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+import base64
 
 # Page configuration
 st.set_page_config(
@@ -115,7 +118,7 @@ def load_results(filename):
 def download_link(df, filename, text):
     """Generate a download link for a dataframe"""
     csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()
+    b64 = base64.b64encode(csv.encode()).decode() 
     href = f'<a href="data:file/csv;base64,{b64}" download="{filename}">{text}</a>'
     return href
 
@@ -440,7 +443,7 @@ with st.sidebar:
         days = st.slider("Days to Search:", min_value=1, max_value=30, value=7)
         
         # Results per keyword - INCREASED MAXIMUM TO 500 as requested
-        max_results_per_keyword = st.slider("Max Results per Keyword:", min_value=5, max_value=500, value=500)
+        max_results_per_keyword = st.slider("Max Results per Keyword:", min_value=5, max_value=500, value=50)
         
         # Order by options
         order_by_options = {
@@ -625,18 +628,16 @@ if st.session_state.search_complete:
             st.session_state.show_analytics = False
     
     with col3:
-        # Export button - Fixed this to work properly
+        # Export button - Fixed this part to use the download_link function
         if len(st.session_state.filtered_results) > 0:
             df_export = pd.DataFrame(st.session_state.filtered_results)
             # Drop the Raw Published Date column which is not useful for export
             if "Raw Published Date" in df_export.columns:
                 df_export = df_export.drop(columns=["Raw Published Date"])
             
-            csv = df_export.to_csv(index=False)
-            b64 = base64.b64encode(csv.encode()).decode()
             export_filename = f"youtube_results_{datetime.now().strftime('%Y%m%d')}.csv"
-            href = f'<a href="data:file/csv;base64,{b64}" download="{export_filename}">📥 Export to CSV</a>'
-            st.markdown(href, unsafe_allow_html=True)
+            download_html = download_link(df_export, export_filename, '📥 Export to CSV')
+            st.markdown(download_html, unsafe_allow_html=True)
     
     # Analytics tab
     if st.session_state.show_analytics:
@@ -706,70 +707,4 @@ if st.session_state.search_complete:
                             <div class="card-title">{video['Title']}</div>
                             <p><strong>Channel:</strong> {video['Channel Name']}</p>
                             <p><strong>Published:</strong> {video['Published Date']}</p>
-                            <p><strong>Duration:</strong> {video['Duration']}</p>
-                            <p><strong>Views:</strong> {video['Views']:,} | <strong>Likes:</strong> {video['Likes']:,} | <strong>Comments:</strong> {video['Comments']:,}</p>
-                            <p><strong>Engagement Rate:</strong> {video['Engagement Rate']}%</p>
-                            <p><strong>Subscribers:</strong> {video['Subscribers']:,}</p>
-                            <p><strong>Keyword:</strong> {video['Keyword']}</p>
-                            <p>{video['Description']}</p>
-                            <p><a href="{video['URL']}" target="_blank">Watch on YouTube</a> | <a href="{video['Channel URL']}" target="_blank">View Channel</a></p>
-                        </div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            # Page navigation - Fixed the Next and Previous buttons
-            st.markdown("<div style='display: flex; justify-content: space-between; margin: 20px 0;'>", unsafe_allow_html=True)
-            
-            col1, col2, col3, col4, col5 = st.columns([1, 1, 3, 1, 1])
-            
-            with col1:
-                if st.button("⏮ Previous", key="prev_button", disabled=st.session_state.page <= 1):
-                    previous_page()
-                    
-            with col2:
-                st.write(f"Page {st.session_state.page} of {total_pages}")
-                
-            with col4:
-                if st.button("⏭ Next", key="next_button", disabled=st.session_state.page >= total_pages):
-                    next_page()
-                    
-            with col5:
-                items_per_page = st.selectbox(
-                    "Per Page:",
-                    options=[5, 10, 20, 50],
-                    index=1,
-                    key="items_per_page_select"
-                )
-                if items_per_page != st.session_state.items_per_page:
-                    st.session_state.items_per_page = items_per_page
-                    st.session_state.page = 1  # Reset to first page when changing items per page
-                    
-            st.markdown("</div>", unsafe_allow_html=True)
-        else:
-            st.info("No results found. Try adjusting your search parameters or filters.")
-else:
-    # Display welcome message and instructions
-    st.markdown("""
-    ## Welcome to YouTube Viral Topics Analyzer
-    
-    This tool helps you discover trending and viral content on YouTube based on your keywords.
-    
-    ### How to use:
-    1. Enter your YouTube API key in the sidebar
-    2. Enter your keywords (one per line)
-    3. Adjust search parameters if needed
-    4. Click "Start Search"
-    5. Use the filters to narrow down results
-    
-    ### Features:
-    - Search for trending videos by keywords
-    - Filter results by views, subscribers, and more
-    - Analyze content trends with built-in analytics
-    - Save and export your search results
-    
-    Get started by entering your API key and keywords in the sidebar!
-    """)
-
-    # Display sample image or video
-    st.image("https://i.imgur.com/UYrEOvA.png", caption="YouTube Viral Topics Analyzer", use_column_width=True)
+                            <p><strong>Duration:</strong> {
