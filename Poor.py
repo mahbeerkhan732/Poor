@@ -343,6 +343,59 @@ def search():
         
         # Sort videos by engagement score
         videos.sort(key=lambda x: x['engagement_score'], reverse=True)
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    data = request.json
+    keyword = data.get('keyword', '')
+    max_results = int(data.get('max_results', 50))
+    
+    # Time filters
+    time_filter = int(data.get('time_filter', 0))  # Days
+    
+    # Duration filters (in seconds)
+    min_duration = int(data.get('min_duration', 0))
+    max_duration = int(data.get('max_duration', 0))
+    if max_duration <= 0:
+        max_duration = None
+    
+    # Subscriber filters
+    min_subscribers = int(data.get('min_subscribers', 0))
+    max_subscribers = int(data.get('max_subscribers', 0))
+    if max_subscribers <= 0:
+        max_subscribers = None
+    
+    try:
+        youtube = get_authenticated_service()
+        videos = search_youtube(
+            youtube, 
+            keyword, 
+            max_results=max_results,
+            published_after=time_filter if time_filter > 0 else None,
+            min_duration=min_duration,
+            max_duration=max_duration,
+            min_subscribers=min_subscribers,
+            max_subscribers=max_subscribers
+        )
+        
+        # Sort videos by engagement score only if videos list is not empty
+        if videos:
+            videos.sort(key=lambda x: x['engagement_score'], reverse=True)
+        
+        # Get AI analysis
+        ai_analysis = ai_analyze_trends(videos)
+        
+        return jsonify({
+            'success': True,
+            'videos': videos,
+            'ai_analysis': ai_analysis
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        })
         
         # Get AI analysis
         ai_analysis = ai_analyze_trends(videos)
