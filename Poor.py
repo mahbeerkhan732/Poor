@@ -1,13 +1,3 @@
-import google.oauth2.credentials
-import google_auth_oauthlib.flow
-import googleapiclient.discovery
-import googleapiclient.errors
-import datetime
-import pandas as pd
-import re
-from dateutil import parser
-from sklearn.preprocessing import MinMaxScaler
-import numpy as np
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a random secret key
