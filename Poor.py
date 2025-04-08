@@ -443,7 +443,7 @@ with st.sidebar:
         days = st.slider("Days to Search:", min_value=1, max_value=30, value=7)
         
         # Results per keyword - INCREASED MAXIMUM TO 500 as requested
-        max_results_per_keyword = st.slider("Max Results per Keyword:", min_value=5, max_value=500, value=50)
+        max_results_per_keyword = st.slider("Max Results per Keyword:", min_value=5, max_value=500, value=500)
         
         # Order by options
         order_by_options = {
