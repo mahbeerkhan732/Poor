@@ -4,6 +4,11 @@ import streamlit as st
 import requests
 from datetime import datetime, timedelta
 import pandas as pd
+import os
+import json
+import plotly.express as px
+from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+import base64
 
 # Page configuration
 st.set_page_config(
@@ -23,80 +28,36 @@ st.markdown("""
         margin-bottom: 1rem;
         font-weight: bold;
     }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #606060;
-        margin-bottom: 1rem;
-    }
-    .metric-card {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: white;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        text-align: center;
     }
-    .metric-value {
-        font-size: 2.2rem;
+    .card-title {
+        font-size: 1.2rem;
         font-weight: bold;
-        color: #FF0000;
-    }
-    .metric-label {
-        font-size: 1rem;
-        color: #606060;
-    }
-    .stButton>button {
-        background-color: #FF0000;
-        color: white;
-        font-weight: bold;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-    }
-    .stButton>button:hover {
-        background-color: #CC0000;
-    }
-    .info-box {
-        background-color: #f0f8ff;
-        padding: 10px;
-        border-radius: 5px;
-        border-left: 5px solid #0066ff;
         margin-bottom: 10px;
     }
-    .video-card {
-        background-color: white;
-        border-radius: 10px;
-        padding: 15px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 15px;
-    }
-    .video-title {
-        color: #1a1a1a;
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-    .stProgress > div > div {
-        background-color: #FF0000;
-    }
-    .view-count {
-        font-weight: bold;
-        color: #1a1a1a;
-    }
-    .sidebar .sidebar-content {
-        background-color: #f8f9fa;
-    }
     .pagination-button {
-        background-color: #f8f9fa;
-        border: 1px solid #dddddd;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
         padding: 5px 10px;
-        margin: 0 5px;
-        border-radius: 5px;
+        margin: 5px;
+        cursor: pointer;
     }
     .pagination-button:hover {
-        background-color: #e9ecef;
+        background-color: #e0e0e0;
     }
-    .active-page {
+    .pagination-active {
         background-color: #FF0000;
         color: white;
+    }
+    .stButton button {
+        width: 100%;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -125,6 +86,8 @@ if 'saved_searches' not in st.session_state:
     st.session_state.saved_searches = []
 if 'date_filter' not in st.session_state:
     st.session_state.date_filter = "all"
+if 'show_analytics' not in st.session_state:
+    st.session_state.show_analytics = False
 
 # Functions
 def save_results(filename, data):
@@ -140,7 +103,7 @@ def save_results(filename, data):
     st.session_state.saved_searches.append({
         "filename": filename,
         "timestamp": timestamp,
-        "count": len(data),
+        "count": len(data.get("results", [])),
         "keywords": st.session_state.last_search_params.get("keywords", [])
     })
     
@@ -151,6 +114,28 @@ def load_results(filename):
     with open(filename, "r") as f:
         data = json.load(f)
     return data
+
+def download_link(df, filename, text):
+    """Generate a download link for a dataframe"""
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="{filename}">{text}</a>'
+    return href
+
+def next_page():
+    """Go to next page"""
+    max_page = (len(st.session_state.filtered_results) - 1) // st.session_state.items_per_page + 1
+    if st.session_state.page < max_page:
+        st.session_state.page += 1
+
+def previous_page():
+    """Go to previous page"""
+    if st.session_state.page > 1:
+        st.session_state.page -= 1
+
+def toggle_analytics():
+    """Toggle analytics view"""
+    st.session_state.show_analytics = not st.session_state.show_analytics
 
 def fetch_youtube_data(api_key, keywords, days, max_results_per_keyword, min_views, max_subscriber_count, order_by):
     """Fetch data from YouTube API"""
@@ -340,13 +325,15 @@ def apply_filters(results, filters):
     if filters.get("min_engagement", 0) > 0:
         filtered = [r for r in filtered if r["Engagement Rate"] >= filters["min_engagement"]]
     
-    # Keyword filter
-    if filters.get("keyword", "") != "":
-        keyword = filters["keyword"].lower()
-        filtered = [r for r in filtered if keyword in r["Title"].lower() or 
-                                            keyword in r["Description"].lower() or 
-                                            keyword in r["Keyword"].lower() or
-                                            keyword in r["Channel Name"].lower()]
+    # Keyword filter - FIX HERE: Check if keyword exists and is not empty first
+    if filters.get("keyword") and filters.get("keyword").strip() != "":
+        keyword = filters.get("keyword", "").lower()  # Using get() to avoid errors
+        filtered = [r for r in filtered if (
+            keyword in r["Title"].lower() or 
+            keyword in r["Description"].lower() or 
+            keyword in r["Keyword"].lower() or
+            keyword in r["Channel Name"].lower()
+        )]
     
     # Date filter
     if filters.get("date_range") == "today":
@@ -455,8 +442,8 @@ with st.sidebar:
         # Date range selection
         days = st.slider("Days to Search:", min_value=1, max_value=30, value=7)
         
-        # Results per keyword
-        max_results_per_keyword = st.slider("Max Results per Keyword:", min_value=5, max_value=50, value=10)
+        # Results per keyword - INCREASED MAXIMUM TO 500 as requested
+        max_results_per_keyword = st.slider("Max Results per Keyword:", min_value=5, max_value=500, value=50)
         
         # Order by options
         order_by_options = {
@@ -569,7 +556,7 @@ Open Relationship"""
                     "min_subscribers": min_subs_filter,
                     "max_subscribers": max_subs_filter,
                     "min_engagement": min_engagement,
-                    "keyword": keyword_filter,
+                    "keyword": keyword_filter,  # This will be checked properly in apply_filters
                     "date_range": date_range,
                     "custom_start_date": custom_start_date,
                     "custom_end_date": custom_end_date
@@ -614,262 +601,178 @@ Open Relationship"""
                 with col2:
                     if st.button(f"Load #{i+1}", key=f"load_{i}"):
                         with st.spinner("Loading saved search..."):
-                            loaded_data = load_results(saved['filename'])
+                            loaded_data = load_results(saved["filename"])
                             st.session_state.results = loaded_data["results"]
                             st.session_state.filtered_results = loaded_data["results"]
-                            st.session_state.last_search_params = loaded_data["search_params"]
                             st.session_state.search_complete = True
+                            st.session_state.last_search_params = loaded_data["search_params"]
+                            st.session_state.page = 1
                             st.success(f"Loaded {len(loaded_data['results'])} results")
         else:
-            st.info("No saved searches yet. Run a search and save it to see it here.")
+            st.info("No saved searches yet")
 
 # Main content
 st.markdown("<h1 class='main-header'>YouTube Viral Topics Analyzer</h1>", unsafe_allow_html=True)
 
-# Show welcome message if no search has been done
-if not st.session_state.search_complete:
-    st.markdown("""
-    <div class="info-box">
-        <h3>Welcome to the YouTube Viral Topics Analyzer!</h3>
-        <p>This tool helps you find trending content on YouTube based on keywords and filters. It's perfect for:</p>
-        <ul>
-            <li>Content creators looking for viral topic ideas</li>
-            <li>Marketers researching trending content</li>
-            <li>Researchers analyzing YouTube trends</li>
-        </ul>
-        <p>Get started by entering your YouTube API key and search parameters in the sidebar.</p>
-    </div>
-    """, unsafe_allow_html=True)
+# Check if search has been performed
+if st.session_state.search_complete:
+    # Action buttons row
+    col1, col2, col3 = st.columns(3)
     
-    # Display sample image
-    st.image("https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg", caption="Discover viral content on YouTube!")
+    with col1:
+        if st.button("📈 Toggle Analytics", key="toggle_analytics", use_container_width=True):
+            toggle_analytics()
     
-    # How to use section
-    with st.expander("How to Use This Tool"):
-        st.markdown("""
-        1. **Enter your YouTube API key** in the sidebar (you can get one from the [Google Cloud Console](https://console.cloud.google.com/))
-        2. **Set search parameters** like days to search and maximum results per keyword
-        3. **Enter keywords** you want to search for (one per line)
-        4. **Click "Start Search"** to fetch results
-        5. **Filter results** using the Filters tab in the sidebar
-        6. **Analyze the data** in the charts and tables
-        7. **Save your searches** for future reference
-        """)
+    with col2:
+        if st.button("🔄 Card View", key="card_view", use_container_width=True):
+            st.session_state.show_analytics = False
     
-    with st.expander("About YouTube API Keys"):
-        st.markdown("""
-        To use this tool, you need a YouTube Data API v3 key. Here's how to get one:
-        
-        1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-        2. Create a new project
-        3. Enable the YouTube Data API v3
-        4. Create an API key
-        5. Copy the API key and paste it into the sidebar
-        
-        Note: The YouTube API has a daily quota limit. Each search uses a portion of your quota.
-        """)
-
-# Show results if search is complete
-elif st.session_state.search_complete:
-    # Top metrics
-    total_results = len(st.session_state.results)
-    total_filtered = len(st.session_state.filtered_results)
-    total_views = sum(r["Views"] for r in st.session_state.filtered_results)
-    avg_engagement = sum(r["Engagement Rate"] for r in st.session_state.filtered_results) / total_filtered if total_filtered > 0 else 0
-    
-    # Display metrics
-    st.markdown("<div class='sub-header'>Search Results Overview</div>", unsafe_allow_html=True)
-    
-    metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
-    
-    with metric_col1:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-value">{total_filtered:,}</div>
-            <div class="metric-label">Videos Found</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with metric_col2:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-value">{total_views:,}</div>
-            <div class="metric-label">Total Views</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with metric_col3:
-        avg_views = int(total_views / total_filtered) if total_filtered > 0 else 0
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-value">{avg_views:,}</div>
-            <div class="metric-label">Avg. Views</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with metric_col4:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-value">{avg_engagement:.2f}%</div>
-            <div class="metric-label">Avg. Engagement Rate</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Tabs for different views of the data
-    tab1, tab2, tab3 = st.tabs(["Videos", "Analytics", "Export"])
-    
-    # Tab 1: Videos
-    with tab1:
-        # Sorting options
-        st.subheader("Videos")
-        
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            sort_options = {
-                "Views": "Views (High to Low)",
-                "Subscribers": "Subscribers (Low to High)",
-                "Engagement Rate": "Engagement Rate (High to Low)",
-                "Raw Published Date": "Newest First"
-            }
-            sort_by = st.selectbox("Sort by:", options=list(sort_options.keys()), 
-                                format_func=lambda x: sort_options[x])
-        with col2:
-            display_mode = st.radio("Display:", ["Cards", "Table"], horizontal=True)
-        
-        # Sort results
-        sorted_results = sorted(
-            st.session_state.filtered_results, 
-            key=lambda x: x[sort_by], 
-            reverse=sort_by != "Subscribers"
-        )
-        
-        # Pagination
-        items_per_page = st.session_state.items_per_page
-        total_pages = max(1, (len(sorted_results) + items_per_page - 1) // items_per_page)
-        
-        if display_mode == "Cards":
-            # Card view
-            start_idx = (st.session_state.page - 1) * items_per_page
-            end_idx = min(start_idx + items_per_page, len(sorted_results))
+    with col3:
+        # Export button - Fixed this to work properly
+        if len(st.session_state.filtered_results) > 0:
+            df_export = pd.DataFrame(st.session_state.filtered_results)
+            # Drop the Raw Published Date column which is not useful for export
+            if "Raw Published Date" in df_export.columns:
+                df_export = df_export.drop(columns=["Raw Published Date"])
             
-            # Display page info
-            st.write(f"Showing {start_idx + 1}-{end_idx} of {len(sorted_results)} results")
+            csv = df_export.to_csv(index=False)
+            b64 = base64.b64encode(csv.encode()).decode()
+            export_filename = f"youtube_results_{datetime.now().strftime('%Y%m%d')}.csv"
+            href = f'<a href="data:file/csv;base64,{b64}" download="{export_filename}">📥 Export to CSV</a>'
+            st.markdown(href, unsafe_allow_html=True)
+    
+    # Analytics tab
+    if st.session_state.show_analytics:
+        st.header("Analytics Dashboard")
+        
+        if len(st.session_state.filtered_results) > 0:
+            views_chart, subscribers_chart, publication_chart, engagement_chart = generate_charts(st.session_state.filtered_results)
             
-            # Display results as cards
-            for result in sorted_results[start_idx:end_idx]:
+            # Display charts in a 2x2 grid
+            chart_col1, chart_col2 = st.columns(2)
+            
+            with chart_col1:
+                st.plotly_chart(views_chart, use_container_width=True)
+                st.plotly_chart(publication_chart, use_container_width=True)
+                
+            with chart_col2:
+                st.plotly_chart(subscribers_chart, use_container_width=True)
+                st.plotly_chart(engagement_chart, use_container_width=True)
+                
+            # Summary statistics
+            st.header("Summary Statistics")
+            
+            # Create a DataFrame for easier analysis
+            df = pd.DataFrame(st.session_state.filtered_results)
+            
+            stats_col1, stats_col2, stats_col3 = st.columns(3)
+            
+            with stats_col1:
+                st.metric("Total Videos", len(df))
+                st.metric("Average Views", f"{int(df['Views'].mean()):,}")
+                
+            with stats_col2:
+                st.metric("Total Views", f"{int(df['Views'].sum()):,}")
+                st.metric("Average Engagement Rate", f"{df['Engagement Rate'].mean():.2f}%")
+                
+            with stats_col3:
+                st.metric("Most Popular Channel", df.loc[df['Views'].idxmax()]["Channel Name"])
+                st.metric("Total Engagement", f"{int(df['Likes'].sum() + df['Comments'].sum()):,}")
+        else:
+            st.info("No data available for analytics. Please run a search first.")
+    
+    # Results display
+    else:
+        st.header(f"Search Results ({len(st.session_state.filtered_results)} videos found)")
+        
+        if len(st.session_state.filtered_results) > 0:
+            # Pagination controls
+            total_pages = (len(st.session_state.filtered_results) - 1) // st.session_state.items_per_page + 1
+            
+            # Display in card format
+            start_idx = (st.session_state.page - 1) * st.session_state.items_per_page
+            end_idx = min(start_idx + st.session_state.items_per_page, len(st.session_state.filtered_results))
+            
+            for idx in range(start_idx, end_idx):
+                video = st.session_state.filtered_results[idx]
+                
+                # Create a card for each video
                 st.markdown(f"""
-                <div class="video-card">
+                <div class="card">
                     <div style="display: flex; align-items: flex-start;">
                         <div style="flex: 0 0 200px; margin-right: 15px;">
-                            <img src="{result['Thumbnail']}" style="width: 100%; border-radius: 5px;">
+                            <a href="{video['URL']}" target="_blank">
+                                <img src="{video['Thumbnail']}" width="200" style="border-radius: 4px;">
+                            </a>
                         </div>
-                        <div style="flex-grow: 1;">
-                            <div class="video-title">{result['Title']}</div>
-                            <div style="margin-top: 5px; font-size: 0.9rem;">{result['Description']}</div>
-                            <div style="margin-top: 10px; font-size: 0.9rem;">
-                                <span class="view-count">{result['Views']:,}</span> views • 
-                                <span>{result['Duration']}</span> • 
-                                Published on {result['Published Date'].split()[0]}
-                            </div>
-                            <div style="margin-top: 5px; font-size: 0.9rem;">
-                                Channel: <b>{result['Channel Name']}</b> ({result['Subscribers']:,} subscribers)
-                            </div>
-                            <div style="margin-top: 5px; font-size: 0.9rem;">
-                                <span style="background-color: #f0f0f0; padding: 3px 8px; border-radius: 3px;">{result['Keyword']}</span>
-                                <span style="margin-left: 10px; background-color: #ffecec; padding: 3px 8px; border-radius: 3px;">
-                                    {result['Engagement Rate']}% engagement
-                                </span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <a href="{result['URL']}" target="_blank" style="background-color: #FF0000; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none;">
-                                    Watch on YouTube
-                                </a>
-                                <a href="{result['Channel URL']}" target="_blank" style="margin-left: 10px; background-color: #606060; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none;">
-                                    Visit Channel
-                                </a>
-                            </div>
+                        <div style="flex: 1;">
+                            <div class="card-title">{video['Title']}</div>
+                            <p><strong>Channel:</strong> {video['Channel Name']}</p>
+                            <p><strong>Published:</strong> {video['Published Date']}</p>
+                            <p><strong>Duration:</strong> {video['Duration']}</p>
+                            <p><strong>Views:</strong> {video['Views']:,} | <strong>Likes:</strong> {video['Likes']:,} | <strong>Comments:</strong> {video['Comments']:,}</p>
+                            <p><strong>Engagement Rate:</strong> {video['Engagement Rate']}%</p>
+                            <p><strong>Subscribers:</strong> {video['Subscribers']:,}</p>
+                            <p><strong>Keyword:</strong> {video['Keyword']}</p>
+                            <p>{video['Description']}</p>
+                            <p><a href="{video['URL']}" target="_blank">Watch on YouTube</a> | <a href="{video['Channel URL']}" target="_blank">View Channel</a></p>
                         </div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
             
-            # Pagination controls
-            if total_pages > 1:
-                cols = st.columns(7)
-                
-                with cols[0]:
-                    if st.button("« First"):
-                        st.session_state.page = 1
-                        st.experimental_rerun()
-                
-                with cols[1]:
-                    if st.button("‹ Prev") and st.session_state.page > 1:
-                        st.session_state.page -= 1
-                        st.experimental_rerun()
-                
-                # Page numbers
-                for i in range(3):
-                    page_num = st.session_state.page - 1 + i
-                    if 0 < page_num <= total_pages:
-                        with cols[i + 2]:
-                            button_text = f"{page_num}"
-                            if page_num == st.session_state.page:
-                                button_text = f"[{page_num}]"
-                            if st.button(button_text):
-                                st.session_state.page = page_num
-                                st.experimental_rerun()
-                
-                with cols[5]:
-                    if st.button("Next ›") and st.session_state.page < total_pages:
-                        st.session_state.page += 1
-                        st.experimental_rerun()
-                
-                with cols[6]:
-                    if st.button("Last »"):
-                        st.session_state.page = total_pages
-                        st.experimental_rerun()
-        
-        else:  # Table view
-            # Convert to DataFrame
-            df = pd.DataFrame(sorted_results)
+            # Page navigation - Fixed the Next and Previous buttons
+            st.markdown("<div style='display: flex; justify-content: space-between; margin: 20px 0;'>", unsafe_allow_html=True)
             
-            # Select columns for display
-            if not df.empty:
-                display_df = df[["Title", "Channel Name", "Subscribers", "Views", "Engagement Rate", "Published Date", "Keyword"]]
-                
-                # Build grid options
-                gb = GridOptionsBuilder.from_dataframe(display_df)
-                gb.configure_column("Title", width=300)
-                gb.configure_column("Channel Name", width=150)
-                gb.configure_column("Subscribers", width=120, type=["numericColumn", "numberColumnFilter"], valueFormatter="data.Subscribers.toLocaleString()")
-                gb.configure_column("Views", width=120, type=["numericColumn", "numberColumnFilter"], valueFormatter="data.Views.toLocaleString()")
-                gb.configure_column("Engagement Rate", width=120, type=["numericColumn", "numberColumnFilter"], valueFormatter="data.Engagement Rate.toFixed(2) + '%'")
-                gb.configure_column("Published Date", width=150)
-                gb.configure_column("Keyword", width=150)
-                
-                # Configure pagination
-                gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
-                
-                # Sorting
-                gb.configure_default_column(sortable=True, filterable=True)
-                
-                # Selection
-                gb.configure_selection(selection_mode="single", use_checkbox=False)
-                
-                grid_options = gb.build()
-                
-                # Create the grid
-                grid_response = AgGrid(
-                    display_df,
-                    gridOptions=grid_options,
-                    allow_unsafe_jscode=True,
-                    update_mode=GridUpdateMode.SELECTION_CHANGED,
-                    height=600
-                )
-                
-                # Show details if a row is selected
-                if grid_response["selected_rows"]:
-                    selected = grid_response["selected_rows"][0]
-                    selected_title = selected["Title"]
+            col1, col2, col3, col4, col5 = st.columns([1, 1, 3, 1, 1])
+            
+            with col1:
+                if st.button("⏮ Previous", key="prev_button", disabled=st.session_state.page <= 1):
+                    previous_page()
                     
+            with col2:
+                st.write(f"Page {st.session_state.page} of {total_pages}")
                 
+            with col4:
+                if st.button("⏭ Next", key="next_button", disabled=st.session_state.page >= total_pages):
+                    next_page()
+                    
+            with col5:
+                items_per_page = st.selectbox(
+                    "Per Page:",
+                    options=[5, 10, 20, 50],
+                    index=1,
+                    key="items_per_page_select"
+                )
+                if items_per_page != st.session_state.items_per_page:
+                    st.session_state.items_per_page = items_per_page
+                    st.session_state.page = 1  # Reset to first page when changing items per page
+                    
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.info("No results found. Try adjusting your search parameters or filters.")
+else:
+    # Display welcome message and instructions
+    st.markdown("""
+    ## Welcome to YouTube Viral Topics Analyzer
+    
+    This tool helps you discover trending and viral content on YouTube based on your keywords.
+    
+    ### How to use:
+    1. Enter your YouTube API key in the sidebar
+    2. Enter your keywords (one per line)
+    3. Adjust search parameters if needed
+    4. Click "Start Search"
+    5. Use the filters to narrow down results
+    
+    ### Features:
+    - Search for trending videos by keywords
+    - Filter results by views, subscribers, and more
+    - Analyze content trends with built-in analytics
+    - Save and export your search results
+    
+    Get started by entering your API key and keywords in the sidebar!
+    """)
+
+    # Display sample image or video
+    st.image("https://i.imgur.com/UYrEOvA.png", caption="YouTube Viral Topics Analyzer", use_column_width=True)
