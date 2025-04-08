@@ -6,8 +6,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 import os
 import json
-import plotly.express as px
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 
 # Page configuration
 st.set_page_config(
