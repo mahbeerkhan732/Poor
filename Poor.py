@@ -1,4 +1,3 @@
-
 # YouTube API settings
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
@@ -342,4 +341,12 @@ def search():
         })
 
 if __name__ == '__main__':
-
+    # Add code block here to fix the indentation error
+    app = Flask(__name__)
+    
+    # Register routes
+    app.route('/')(index)
+    app.route('/search', methods=['POST'])(search)
+    
+    # Run the app
+    app.run(debug=True, port=5000)
