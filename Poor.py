@@ -1,7 +1,4 @@
 
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Change this to a random secret key
-
 # YouTube API settings
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
