@@ -291,7 +291,6 @@ def ai_analyze_trends(videos):
 def index():
     return render_template('index.html')
 
-@app.route('/search', methods=['POST'])
 def search():
     data = request.json
     keyword = data.get('keyword', '')
