@@ -1,3 +1,16 @@
+import os
+import re
+import json
+import datetime
+from flask import Flask, request, jsonify, render_template
+import google.oauth2.credentials
+import google_auth_oauthlib.flow
+from googleapiclient.discovery import googleapiclient
+from google.auth.transport.requests import Request
+from dateutil import parser
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+
 # YouTube API settings
 API_SERVICE_NAME = 'youtube'
 API_VERSION = 'v3'
@@ -287,9 +300,14 @@ def ai_analyze_trends(videos):
         "best_publish_time": best_publish_time
     }
 
+# Flask app setup and routes
+app = Flask(__name__)
+
+@app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/search', methods=['POST'])
 def search():
     data = request.json
     keyword = data.get('keyword', '')
@@ -341,12 +359,4 @@ def search():
         })
 
 if __name__ == '__main__':
-    # Add code block here to fix the indentation error
-    app = Flask(__name__)
-    
-    # Register routes
-    app.route('/')(index)
-    app.route('/search', methods=['POST'])(search)
-    
-    # Run the app
     app.run(debug=True, port=5000)
