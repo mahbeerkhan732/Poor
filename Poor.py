@@ -1,5 +1,13 @@
 import streamlit as st
 import pandas as pd
+from googleapiclient.discovery import build
+import datetime
+import re
+import time
+import base64
+from io import BytesIO
+import iso639
+import pycountry
 
 # Set page config
 st.set_page_config(
@@ -45,6 +53,9 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# Initialize youtube as None
+youtube = None
 
 # Function to format duration from ISO 8601 format
 def format_duration(duration_str):
@@ -261,7 +272,7 @@ with tab1:
     # Initialize the YouTube API
     if api_key:
         try:
-            youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
+            youtube = build("youtube", "v3", developerKey=api_key)
         except Exception as e:
             st.error(f"Error initializing YouTube API: {str(e)}")
     
